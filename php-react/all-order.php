@@ -11,7 +11,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // DB connection: $db_connection from db_connection.php
 require 'db_connection.php';
 
-$allUsers = mysqli_query($db_connection, "SELECT seq as SEQ, OrderId as orderID, ProdId as prodID, Qty as QTY, Discount as discount FROM `orderdetail`");
+$allUsers = mysqli_query($db_connection, "SELECT `orderdetail`.seq as SEQ, orderdetail.OrderId as orderID, ProdId as prodID, Qty as QTY, Discount as discount, EmpId as empid, CustId as custid, OrderDate as orderdate FROM `orderdetail` ,`salesorder` WHERE `salesorder`.OrderId = `orderdetail`.OrderId ");
 if (mysqli_num_rows($allUsers) > 0) {
     $all_users = mysqli_fetch_all($allUsers, MYSQLI_ASSOC);
     // json_encode([],JSON_UNESCAPED_UNICODE) 參數一定要加才會正確顯示中文

@@ -47,6 +47,36 @@ const UpdateO = () => {
         console.log(err);
       });
   };
+  const insertOrder = (OD, ED, CD, DATE) => {
+    // filter outing the user.
+    fetch('http://localhost/php-react/update-sales.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        orderID: OD, empID: ED, custID: CD, date: DATE,
+      }),
+    })
+      .then((res) => {
+        const d = res.json();
+        // console.log(d);
+        return d;
+      })
+      .then((data) => {
+        if (data.success) {
+          // console.log('users:');
+          // console.log(user);
+        } else {
+          alert(data.msg);
+        }
+        // console.log('ipd:');
+        // console.log(pd);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <Helmet>
@@ -68,14 +98,21 @@ const UpdateO = () => {
               prodID: state.prodID,
               QTY: state.QTY,
               discount: state.discount,
+              empdID: state.empid,
+              custID: state.custid,
+              orderdate: state.orderdate,
             }}
             validationSchema={Yup.object().shape({
               orderID: Yup.string().max(255).required('orderID is required'),
+              empdID: Yup.string().max(255).required('empdID is required'),
+              custID: Yup.string().max(255).required('custID is required'),
+              orderdate: Yup.string().max(255).required('orderdate is required'),
               prodID: Yup.string().max(255).required('prodID is required'),
               QTY: Yup.string().max(255).required('QTY is required'),
               discount: Yup.string().max(255).required('discount is required'),
             })}
             onSubmit={(values) => {
+              insertOrder(values.orderID, values.empdID, values.custID, values.orderdate);
               insertProd(values.orderID, values.prodID, values.QTY, values.discount, state.SEQ,);
             }}
           >
@@ -144,6 +181,45 @@ const UpdateO = () => {
                   onChange={handleChange}
                   type="text"
                   value={values.orderID}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.empdID && errors.empdID)}
+                  fullWidth
+                  helperText={touched.empdID && errors.empdID}
+                  label="員工編號"
+                  margin="normal"
+                  name="empdID"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="text"
+                  value={values.empdID}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.custID && errors.custID)}
+                  fullWidth
+                  helperText={touched.custID && errors.custID}
+                  label="客戶編號"
+                  margin="normal"
+                  name="custID"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="text"
+                  value={values.custID}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.orderdate && errors.orderdate)}
+                  fullWidth
+                  helperText={touched.orderdate && errors.orderdate}
+                  label="訂單日期"
+                  margin="normal"
+                  name="orderdate"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="date"
+                  value={values.orderdate}
                   variant="outlined"
                 />
                 <TextField

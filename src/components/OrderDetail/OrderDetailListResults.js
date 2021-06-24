@@ -34,6 +34,68 @@ const OrderDetailListResults = ({ customers, ...rest }) => {
   // console.log(user);
   // // navigate('/app/UpdateP', { replace: true, state: data });
   // };
+  const handleSubmitSD = (theID) => {
+    console.log(theID);
+    // const userDeleted = users.filter((user) => {
+    //   console.log(user);
+    //   return user.id !== theID;
+    // });
+    fetch('http://localhost/php-react/delete-sales.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderID: theID }),
+    })
+      .then((res) => {
+        const d = res.json();
+        // console.log(d);
+        return d;
+      })
+      .then((data) => {
+        if (data.success) {
+          // setUsers(userDeleted);
+          // setUserLength(users.length);
+        } else {
+          alert(data.msg);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const handleSubmitBD = (theID) => {
+    console.log(theID);
+    // const userDeleted = users.filter((user) => {
+    //   console.log(user);
+    //   return user.id !== theID;
+    // });
+    fetch('http://localhost/php-react/bigdelete-order.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderID: theID }),
+    })
+      .then((res) => {
+        const d = res.json();
+        // console.log(d);
+        return d;
+      })
+      .then((data) => {
+        if (data.success) {
+          // setUsers(userDeleted);
+          // setUserLength(users.length);
+          alert('刪除成功');
+          navigate('/app/dashboard', { replace: true });
+        } else {
+          alert(data.msg);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const handleSubmitD = (theID) => {
     console.log(theID);
     // const userDeleted = users.filter((user) => {
@@ -125,6 +187,15 @@ const OrderDetailListResults = ({ customers, ...rest }) => {
                   產品ID
                 </TableCell>
                 <TableCell>
+                  員工代號
+                </TableCell>
+                <TableCell>
+                  客戶代號
+                </TableCell>
+                <TableCell>
+                  訂貨日期
+                </TableCell>
+                <TableCell>
                   數量
                 </TableCell>
                 <TableCell>
@@ -134,7 +205,10 @@ const OrderDetailListResults = ({ customers, ...rest }) => {
                   修改
                 </TableCell>
                 <TableCell>
-                  刪除
+                  刪除明細
+                </TableCell>
+                <TableCell>
+                  刪除訂單
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -169,6 +243,15 @@ const OrderDetailListResults = ({ customers, ...rest }) => {
                     {user.prodID}
                   </TableCell>
                   <TableCell>
+                    {user.empid}
+                  </TableCell>
+                  <TableCell>
+                    {user.custid}
+                  </TableCell>
+                  <TableCell>
+                    {user.orderdate}
+                  </TableCell>
+                  <TableCell>
                     {user.QTY}
                   </TableCell>
                   <TableCell>
@@ -196,9 +279,25 @@ const OrderDetailListResults = ({ customers, ...rest }) => {
                         }
                       }}
                     >
-                      刪除
+                      刪除明細
+                    </Button>
+
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => {
+                        if (window.confirm('Are you sure?')) {
+                          handleSubmitSD(user.orderID);
+                          handleSubmitBD(user.orderID);
+                        }
+                      }}
+                    >
+                      刪除定單
                     </Button>
                   </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
@@ -8,11 +9,15 @@ import {
   Container,
   Grid,
   TextField,
-  Typography
+  Typography,
+  Checkbox,
+  FormControlLabel,
 } from '@material-ui/core';
 
 const InsertO = () => {
   const navigate = useNavigate();
+  const [checked, setChecked] = useState(true);
+  const [orderchecked, setorderChecked] = useState(true);
   const insertProd = (PD, PID, UN, CO) => {
     // filter outing the user.
     fetch('http://localhost/php-react/add-order.php', {
@@ -45,6 +50,36 @@ const InsertO = () => {
         console.log(err);
       });
   };
+  const insertOrder = (OD, ED, CD, DATE) => {
+    // filter outing the user.
+    fetch('http://localhost/php-react/add-sales.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        orderID: OD, empID: ED, custID: CD, date: DATE,
+      }),
+    })
+      .then((res) => {
+        const d = res.json();
+        // console.log(d);
+        return d;
+      })
+      .then((data) => {
+        if (data.success) {
+          // console.log('users:');
+          // console.log(user);
+        } else {
+          alert(data.msg);
+        }
+        // console.log('ipd:');
+        // console.log(pd);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <Helmet>
@@ -63,18 +98,30 @@ const InsertO = () => {
           <Formik
             initialValues={{
               orderID: 'testO1',
+              empdID: 'test001',
+              custID: 'test01',
+              orderdate: '2021-06-24',
               prodID: 'TO000111',
               QTY: '5000',
               discount: '0.56',
             }}
             validationSchema={Yup.object().shape({
               orderID: Yup.string().max(255).required('orderID is required'),
+              empdID: Yup.string().max(255).required('empdID is required'),
+              custID: Yup.string().max(255).required('custID is required'),
+              orderdate: Yup.string().max(255).required('orderdate is required'),
               prodID: Yup.string().max(255).required('prodID is required'),
               QTY: Yup.string().max(255).required('QTY is required'),
               discount: Yup.string().max(255).required('discount is required'),
             })}
-            onSubmit={(values) => {
-              insertProd(values.orderID, values.prodID, values.QTY, values.discount,);
+            onSubmit={(values, props) => {
+              console.log(props);
+              if (checked) {
+                insertOrder(values.orderID, values.empdID, values.custID, values.orderdate);
+                insertProd(values.orderID, values.prodID, values.QTY, values.discount,);
+              } else if (orderchecked) {
+                insertProd(values.orderID, values.prodID, values.QTY, values.discount,);
+              }
             }}
           >
             {({
@@ -145,6 +192,45 @@ const InsertO = () => {
                   variant="outlined"
                 />
                 <TextField
+                  error={Boolean(touched.empdID && errors.empdID)}
+                  fullWidth
+                  helperText={touched.empdID && errors.empdID}
+                  label="員工編號"
+                  margin="normal"
+                  name="empdID"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="text"
+                  value={values.empdID}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.custID && errors.custID)}
+                  fullWidth
+                  helperText={touched.custID && errors.custID}
+                  label="客戶編號"
+                  margin="normal"
+                  name="custID"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="text"
+                  value={values.custID}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.orderdate && errors.orderdate)}
+                  fullWidth
+                  helperText={touched.orderdate && errors.orderdate}
+                  label="訂單日期"
+                  margin="normal"
+                  name="orderdate"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="date"
+                  value={values.orderdate}
+                  variant="outlined"
+                />
+                <TextField
                   error={Boolean(touched.prodID && errors.prodID)}
                   fullWidth
                   helperText={touched.prodID && errors.prodID}
@@ -184,6 +270,26 @@ const InsertO = () => {
                   variant="outlined"
                 />
                 <Box sx={{ py: 2 }}>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={checked}
+                        onChange={(e) => setChecked(e.target.checked)}
+                      />
+                    )}
+                    label="新增訂單"
+                  />
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={orderchecked}
+                        onChange={() => setorderChecked(!orderchecked)}
+                      />
+                    )}
+                    label="新增明細"
+                  />
+                </Box>
+                <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"
                     disabled={isSubmitting}
@@ -191,6 +297,9 @@ const InsertO = () => {
                     size="large"
                     type="submit"
                     variant="contained"
+                    inputProps={{
+                      'aria-label': 'secondary checkbox'
+                    }}
                   >
                     新增!
                   </Button>
